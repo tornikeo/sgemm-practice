@@ -9,34 +9,34 @@
 
 /*
 =====================================
-CUDA操作
+CUDA operations
 =====================================
 */
-void cudaCheck(cudaError_t error, const char *file, int line); //CUDA错误检查
-void CudaDeviceInfo();                                         // 打印CUDA信息
+void cudaCheck(cudaError_t error, const char *file, int line); // CUDA error checking
+void CudaDeviceInfo();                                         // Print CUDA info
 
 /*
 =====================================
-矩阵操作
+Matrix operations
 =====================================
 */
-void randomize_matrix(float *mat, int N);            // 随机初始化矩阵
-void copy_matrix(float *src, float *dest, int N);    // 复制矩阵
-void print_matrix(const float *A, int M, int N);     // 打印矩阵
-bool verify_matrix(float *mat1, float *mat2, int N); // 验证矩阵
+void randomize_matrix(float *mat, int N);            // Randomly initialize matrix
+void copy_matrix(float *src, float *dest, int N);    // Copy matrix
+void print_matrix(const float *A, int M, int N);     // Print matrix
+bool verify_matrix(float *mat1, float *mat2, int N); // Verify matrix
 
 /*
 =====================================
-计时操作
+Timing operations
 =====================================
 */
-float get_current_sec();                        // 获取当前时刻
-float cpu_elapsed_time(float &beg, float &end); // 计算时间差
+float get_current_sec();                        // Get current time
+float cpu_elapsed_time(float &beg, float &end); // Calculate time difference
 
 /*
 =====================================
-kernel操作
+Kernel operations
 =====================================
 */
-//调用指定核函数计算矩阵乘法
+// Call the specified kernel function to compute matrix multiplication
 void test_kernel(int kernel_num, int m, int n, int k, float alpha, float *A, float *B, float beta, float *C, cublasHandle_t handle);

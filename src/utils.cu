@@ -61,7 +61,7 @@ void CudaDeviceInfo() {
 };
 
 void randomize_matrix(float *mat, int N) {
-    // NOTICE: 使用gettimeofdays替代srand((unsigned)time(NULL));time精度过低，产生相同随机数
+    // NOTICE: Use gettimeofday instead of srand((unsigned)time(NULL)); time precision is too low and produces the same random numbers
     struct timeval time;
     gettimeofday(&time, NULL);
     srand(time.tv_usec);
@@ -112,7 +112,7 @@ bool verify_matrix(float *mat1, float *mat2, int N) {
 #define CEIL_DIV(M, N) ((M) + (N)-1) / (N)
 
 void test_cublas(cublasHandle_t handle, int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
-    //cublas列主序计算：https://www.cnblogs.com/cuancuancuanhao/p/7763256.html
+    // cublas column-major computation: https://www.cnblogs.com/cuancuancuanhao/p/7763256.html
     cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, N, M, K, &alpha, B, N, A, K, &beta, C, N);
 }
 

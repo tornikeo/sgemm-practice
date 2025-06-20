@@ -20,14 +20,14 @@ int main(int argc, char **argv) {
         printf("Select kernel %d.\n", kernel_num);
     };
 
-    // 申明句柄，创建句柄, cublasCreate会返回一个cublasStatus_t类型的值，用来判断句柄是否创建成功(值为0)
+    // Declare handle, create handle, cublasCreate returns a value of type cublasStatus_t to determine if the handle was created successfully (value 0)
     cublasHandle_t handle;
     if (cublasCreate(&handle)) {
         printf("Create cublas handle error.\n");
         exit(EXIT_FAILURE);
     };
 
-    // 采用cudaEvent进行gpu流计时，cudaEvent相当于在目标流中发布事件任务
+    // Use cudaEvent for GPU stream timing, cudaEvent is equivalent to posting an event task in the target stream
     float elapsed_time;
     cudaEvent_t beg, end;
     cudaEventCreate(&beg);
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     max_size = SIZE[size_len - 1];
     printf("max_size=%d\n", max_size);
 
-    float alpha = 1.0, beta = 0.; //two arbitary input parameters，C=α*AB+β*C
+    float alpha = 1.0, beta = 0.; //two arbitary input parameters, C=α*AB+β*C
 
     float *A = NULL, *B = NULL, *C = NULL, *C_ref = NULL;     //host matrices
     float *dA = NULL, *dB = NULL, *dC = NULL, *dC_ref = NULL; //device matrices
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
         m = n = k = SIZE[i];
 
         printf("m=n=k=%d\n", m);
-        // 验证计算正确性，同时在核函数计时前预先执行一次，避免冷启动误差
+        // Verify calculation correctness, and pre-execute once before kernel timing to avoid cold start error
         if (kernel_num != 0) {
             test_kernel(0, m, n, k, alpha, dA, dB, beta, dC_ref, handle);      // cuBLAS
             test_kernel(kernel_num, m, n, k, alpha, dA, dB, beta, dC, handle); // user define
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
         cudaEventSynchronize(beg);
         cudaEventSynchronize(end);
         cudaEventElapsedTime(&elapsed_time, beg, end);
-        elapsed_time /= 1000.; //换算成秒
+        elapsed_time /= 1000.; //Convert to seconds
 
         printf("Average elasped time: (%f) second, performance: (%f) GFLOPS. size: (%d).\n",
                elapsed_time / repeat_times, 2. * 1e-9 * repeat_times * m * n * k / elapsed_time, m);
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
         copy_matrix(C_ref, C, m * n); //sync C with cuBLAS to prepare for the next run
     }
 
-    // 释放CPU和GPU空间
+    // Release CPU and GPU memory
     free(A);
     free(B);
     free(C);
