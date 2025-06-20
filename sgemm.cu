@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     };
 
     // Use cudaEvent for GPU stream timing, cudaEvent is equivalent to posting an event task in the target stream
-    float elapsed_time;
+    float elapsed_time, cublas_elapsed_time;
     cudaEvent_t beg, end;
     cudaEventCreate(&beg);
     cudaEventCreate(&end);
@@ -89,6 +89,24 @@ int main(int argc, char **argv) {
         }
         cudaDeviceSynchronize();
 
+        // Warm up GPU
+        test_kernel(0, m, n, k, alpha, dA, dB, beta, dC, handle);
+        test_kernel(kernel_num, m, n, k, alpha, dA, dB, beta, dC, handle);
+        cudaDeviceSynchronize();
+
+        // Get cuBLAS performance
+        cudaEventRecord(beg);
+        for (int j = 0; j < repeat_times; j++) {
+            test_kernel(0, m, n, k, alpha, dA, dB, beta, dC, handle); // cuBLAS reference
+        }
+        cudaEventRecord(end);
+        cudaEventSynchronize(beg);
+        cudaEventSynchronize(end);
+        cudaEventElapsedTime(&cublas_elapsed_time, beg, end);
+        cublas_elapsed_time /= 1000.; //Convert to seconds
+        float cublas_flops = 2. * 1e-9 * repeat_times * m * n * k / cublas_elapsed_time;
+
+        // Get user defined kernel performance
         cudaEventRecord(beg);
         for (int j = 0; j < repeat_times; j++) {
             test_kernel(kernel_num, m, n, k, alpha, dA, dB, beta, dC, handle);
@@ -98,9 +116,11 @@ int main(int argc, char **argv) {
         cudaEventSynchronize(end);
         cudaEventElapsedTime(&elapsed_time, beg, end);
         elapsed_time /= 1000.; //Convert to seconds
+        float flops = 2. * 1e-9 * repeat_times * m * n * k / elapsed_time;
+        
 
-        printf("Average elasped time: (%f) second, performance: (%f) GFLOPS. size: (%d).\n",
-               elapsed_time / repeat_times, 2. * 1e-9 * repeat_times * m * n * k / elapsed_time, m);
+        printf("Average elasped time: (%f) second, performance: (%f) GFLOPS (%05.2f%% of cuBLAS). size: (%d).\n",
+               elapsed_time / repeat_times, flops, (flops / cublas_flops) * 100, m);
         fflush(stdout);
         copy_matrix(C_ref, C, m * n); //sync C with cuBLAS to prepare for the next run
     }

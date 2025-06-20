@@ -16,5 +16,12 @@ meson compile -C builddir
 
 Run:
 ```sh
-./builddir/sgemm 0  # Run unoptimized kernel and comapre with cublas
+# Test cuBLAS itself. Note % of cuBLAS could vary (at times over 100%)
+meson test -C builddir/ sgemm_0 -vt 0
+
+# Test naive kernel
+meson test -C builddir/ sgemm_1 -vt 0
+
+# Test progressively better kernels 2,3,...
+meson test -C builddir/ sgemm_2 -vt 0
 ```
