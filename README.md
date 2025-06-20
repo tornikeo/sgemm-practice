@@ -25,3 +25,16 @@ meson test -C builddir/ sgemm_1 -vt 0
 # Test progressively better kernels 2,3,...
 meson test -C builddir/ sgemm_2 -vt 0
 ```
+
+If you have ncu installed you can use GUI for some more details.
+
+```sh
+# -k mysgemm_v1: find kernel named mysgemm_v1
+# -c 4: Only launch profiles kernel 4 times
+# --open-in-ui: Launch NCU GUI application
+# --set full: Get full analysis
+# --kill=yes: Don't wait for meson to finish after those 4 launches
+
+ncu -k mysgemm_v1 -c 4 --open-in-ui --se
+t full --kill=yes  meson test -C builddir/ sgemm_1 -vt 0
+```
